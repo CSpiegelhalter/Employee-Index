@@ -1,0 +1,26 @@
+{
+  "name": "Employee-Index",
+  "version": "1.0.0",
+  "description": "Control your database of employees through the console.",
+  "main": "index.js",
+  "dependencies": {
+    "asciiart-logo": "^0.2.6",
+    "inquirer": "^7.3.3",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CSpiegelhalter/Employee-Index.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CSpiegelhalter/Employee-Index/issues"
+  },
+  "homepage": "https://github.com/CSpiegelhalter/Employee-Index#readme"
+}
