@@ -106,13 +106,14 @@ module.exports = function(connection) {
                     
                         },
                     ]).then((result) => {
-                        console.log(result.department_id)
+                        newID = result.department_id
+                        console.log(newID.charAt(newID.length-1))
                         connection.query(
                             "INSERT INTO role SET ?",
                             {
                             title: result.title,
                             salary: result.salary,
-                            department_id: result.department_id
+                            department_id: newID.charAt(newID.length-1)
                             },
                             function(err) {
                             if (err) throw err;
@@ -245,23 +246,24 @@ module.exports = function(connection) {
                     message: "What is the role's updated department ID?",
                     choices: function() {
                         var choiceArray = [];
-                        connection.query('SELECT name FROM department', function(err, results){
                         for (var i = 0; i < results.length; i++) {
-                            choiceArray.push(results[i].id);
+                            choiceArray.push(results[i].title + ": " + results[i].id);
+                            console.log(choiceArray)
                         }
-                        return choiceArray;
-                    })
-                    }
-               
-                },
+                        return choiceArray;   
+                }
+                
+        
+            },
             ]).then((result) => {
+                newID = result.department_id
                 connection.query(
-                    "UPDATE roles SET ? WHERE ?",
+                    "UPDATE role SET ? WHERE ?",
                     [
                       {
                         title: result.title,
                         salary: result.salary,
-                        department_id: result.department_id
+                        department_id: newID.charAt(newID.length-1)
                       },
                       {
                         title: result.specify
