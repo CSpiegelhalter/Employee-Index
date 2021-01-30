@@ -23,7 +23,7 @@ module.exports = function(connection) {
                 name: 'crud',
                 type: 'list',
                 message: 'What would you like to do with your departments, roles, or employees?',
-                choices: ['Add', 'View', 'Update']
+                choices: ['Add', 'View', 'Update', 'Exit']
             },
         ]).then((result) => {
             if (result.crud == 'Add') {
@@ -34,6 +34,9 @@ module.exports = function(connection) {
             }
             else if (result.crud == 'Update') {
                 update();
+            }
+            else if (result.crud == 'Exit') {
+                connection.end();
             }
             else {
                 console.log("Something went wrong.")
