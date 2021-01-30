@@ -126,7 +126,7 @@ module.exports = function(connection) {
                             function(err) {
                             if (err) throw err;
                             // Success throw
-                            console.log("Your department was created successfully!");
+                            console.log("Your role was created successfully!");
                             // Back to main menu
                             init();
                             }
@@ -159,7 +159,7 @@ module.exports = function(connection) {
                                 var choiceArray = [];
                                 // Goes through all the roles in DB, pushing them to the array to be printed
                                 for (var i = 0; i < results.length; i++) {
-                                    choiceArray.push(results[i].title);
+                                    choiceArray.push(results[i].title + " || ID: " + results[i].id);
                                 }
                                 // Sends back data to be printed for the user
                                 return choiceArray;
@@ -171,13 +171,13 @@ module.exports = function(connection) {
                             message: "What is the employee's manager's ID (Leave blank if this doesn't apply)?"
                         }
                     ]).then((result) => {
-                        console.log(result)
+                        newID = result.role_id
                     connection.query(
                         "INSERT INTO employee SET ?",
                         {
                             first_name: result.first_name,
                             last_name: result.last_name,
-                            role_id: result.role_id,
+                            role_id: newID.charAt(newID.length-1),
                             manager_id: result.manager_id || null,
                         },
                         function(err) {
@@ -247,74 +247,64 @@ module.exports = function(connection) {
 
     }
     
-    // Lets you update a role of your choosing
+    // Lets you update an employees role
     function update() {
 
-        connection.query("SELECT * FROM role", function(err, results) {
-            if (err) throw err;
-            inquirer.prompt ([
-                {
-                    name: 'specify',
-                    type:'rawlist',
-                    message: 'What role would you like to update?',
-                    choices: function() {
-                        var choiceArray = [];
-                        // Goes through all the roles in DB, pushing them to the array to be printed
-                        for (var i = 0; i < results.length; i++) {
-                            choiceArray.push(results[i].title);
+        connection.query("SELECT * FROM employee", function(err, data) {
+            connection.query("SELECT * FROM role", function(err, results) {
+                if (err) throw err;
+                inquirer.prompt ([
+                    {
+                        name: 'specify',
+                        type:'rawlist',
+                        message: "What employee's role would you like to update?",
+                        choices: function() {
+                            var choiceArray = [];
+                            // Goes through all the roles in DB, pushing them to the array to be printed
+                            for (var i = 0; i < data.length; i++) {
+                                choiceArray.push(data[i].first_name + " " + data[i].last_name + " || ID: " + data[i].id);
+                            }
+                            // Sends back data to be printed for the user
+                            return choiceArray;
                         }
-                        // Sends back data to be printed for the user
-                        return choiceArray;
+                    },
+                    {
+                        name: 'department_id',
+                        type: 'rawlist',
+                        message: "What should be the employee's updated role ID?",
+                        choices: function() {
+                            var choiceArray = [];
+                            // Gets all the department ids 
+                            for (var i = 0; i < results.length; i++) {
+                                choiceArray.push(results[i].title + ": " + results[i].id);
+                                console.log(choiceArray)
+                            }
+                            return choiceArray;   
                     }
+                    
+            
                 },
-                {
-                    name: 'title',
-                    type: 'input',
-                    message: "What is the role's updated title?"
-                },
-
-                {
-                    name: 'salary',
-                    type: 'input',
-                    message: "What is the role's updated salary?"
-                },
-                {
-                    name: 'department_id',
-                    type: 'rawlist',
-                    message: "What is the role's updated department ID?",
-                    choices: function() {
-                        var choiceArray = [];
-                        // Gets all the department ids 
-                        for (var i = 0; i < results.length; i++) {
-                            choiceArray.push(results[i].title + ": " + results[i].id);
-                            console.log(choiceArray)
+                ]).then((result) => {
+                    newID = result.department_id
+                    employeeID = result.specify
+                    connection.query(
+                        "UPDATE employee SET ? WHERE ?",
+                        [
+                        {
+                            role_id: newID.charAt(newID.length-1)
+                        },
+                        {
+                            id: employeeID.charAt(employeeID.length-1)
                         }
-                        return choiceArray;   
-                }
-                
-        
-            },
-            ]).then((result) => {
-                newID = result.department_id
-                connection.query(
-                    "UPDATE role SET ? WHERE ?",
-                    [
-                      {
-                        title: result.title,
-                        salary: result.salary,
-                        department_id: newID.charAt(newID.length-1)
-                      },
-                      {
-                        title: result.specify
-                      }
-                    ],
-                    function(err, res) {
-                      if (err) throw err;
-                      console.log("Role updated!\n");
-                      init();
-                    }
-                )
+                        ],
+                        function(err, res) {
+                        if (err) throw err;
+                        console.log("Role updated!\n");
+                        init();
+                        }
+                    )
 
+                })
             })
         })
     }
